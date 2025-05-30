@@ -6,7 +6,9 @@
             <slot></slot>
         </a-layout-content>
         <a-layout-footer style="text-align: center">
-            Configuration was last updated on {{ new Date() }}
+            <client-only>
+                Configuration was last updated on {{ new Date() }}
+            </client-only>
         </a-layout-footer>
     </a-layout>
 </template>

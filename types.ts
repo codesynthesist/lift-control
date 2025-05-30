@@ -1,3 +1,5 @@
+import type { Dayjs } from 'dayjs';
+
 export const enum ElevatorTypes {
     PASSENGER = 'passenger',
     CARGO = 'cargo',
@@ -15,8 +17,8 @@ export interface ElevatorConfig {
     type: ElevatorTypes;
     capacity: number; // kg
     speed: number; // m/s
-    creationDate: string;
-    lastServiceDate: string;
+    creationDate: Dayjs | null;
+    lastServiceDate: Dayjs | null;
 }
 
 export type ElevatorForm = Omit<ElevatorConfig, 'id'>;
@@ -25,6 +27,6 @@ export interface ElevatorState {
     id: number;
     enabled: boolean;
     currentFloor: number;
-    queue: number[];
-    direction: Direction;
+    queue: number[] | null;
+    direction: Direction | null;
 }

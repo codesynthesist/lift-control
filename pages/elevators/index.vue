@@ -1,47 +1,39 @@
 <template>
     <PageTitle>
         <template #actions>
-            <nuxt-link to="/elevators/add">
-                <a-button type="primary">Добавить</a-button>
-            </nuxt-link>
+            <div class="flex gap-1">
+                <a-button type="primary" danger @click="clear">Очистить</a-button>
+                <nuxt-link to="/elevators/add">
+                    <a-button type="primary" class="gap-1">Добавить</a-button>
+                </nuxt-link>
+            </div>
         </template>
     </PageTitle>
 
-    <div class="flex flex-wrap">
-        <nuxt-link
-            v-for="elevator of elevators"
-            :key="elevator.id"
-            :to="`/elevators/${elevator.id}`"
-        >
-            <a-card
-                hoverable
-                class="mr-5 mb-5"
-                style="width: 240px"
+    <client-only>
+        <div class="flex flex-wrap w-full">
+            <nuxt-link
+                v-for="elevator of elevators"
+                :key="elevator.id"
+                :to="`/elevators/${elevator.id}`"
             >
-                <template #cover>
-                    <!--                <nuxt-img></nuxt-img>-->
-                </template>
+                    <ElevatorCard
+                        :elevator="elevator"
+                        :state="getElevatorState(elevator.id)"
+                    ></ElevatorCard>
 
-                <a-card-meta :title="elevator.name">
-                    <template #description>
-                        <p class="lift-card__state">
-                            <MenuUnfoldOutlined />
-                            <b>6</b>
-                        </p>
-                        <p class="lift-card__state">
-                            <QuestionCircleOutlined />
-                            <b>6</b>
-                        </p>
-                    </template>
-                </a-card-meta>
-            </a-card>
-        </nuxt-link>
-
-    </div>
+            </nuxt-link>
+        </div>
+        <template #fallback>
+            <a-empty/>
+        </template>
+    </client-only>
 </template>
 
 <script setup lang="ts">
 import { useElevatorsStore } from '~/stores/elevator';
+import ElevatorCard from '~/components/ElevatorCard.vue';
+import type { ElevatorState } from '~/types';
 
 definePageMeta({
     title: 'Лифты',
@@ -49,21 +41,13 @@ definePageMeta({
 
 const elevatorsStore = useElevatorsStore();
 
-const { elevators } = storeToRefs(elevatorsStore)
+const { elevators, elevatorsState } = storeToRefs(elevatorsStore);
 
-</script>
-
-<style scoped lang="scss">
-.lift-card {
-    &__state {
-        display: flex;
-        margin-bottom: 4px;
-
-        b {
-            display: inline-block;
-            line-height: 1em;
-            margin-left: 8px;
-        }
-    }
+function getElevatorState(id: number): ElevatorState {
+    return elevatorsState.value.find((e: ElevatorState) => e.id === id) as ElevatorState;
 }
-</style>
+
+function clear() {
+    elevatorsStore.clearElevators();
+}
+</script>

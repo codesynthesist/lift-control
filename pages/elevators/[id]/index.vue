@@ -1,10 +1,10 @@
 <template>
     <div class="flex justify-between">
         <slot>
-            <a-typography-title :level="2">{{ elevator?.name }}</a-typography-title>
+            <a-typography-title :level="2">{{ elevator.name }}</a-typography-title>
         </slot>
         <slot name="actions">
-            <a-button type="primary">Удалить</a-button>
+            <a-button type="primary" @click="remove(elevator.id)">Удалить</a-button>
         </slot>
     </div>
 </template>
@@ -13,8 +13,9 @@
 import type { ElevatorConfig } from '~/types';
 
 const route = useRoute();
-const { elevators } = useElevatorsStore();
-const elevator = ref<ElevatorConfig>();
+const router = useRouter();
+const { elevators, removeElevator } = useElevatorsStore();
+const elevator = ref<ElevatorConfig>({} as ElevatorConfig);
 
 onMounted(() => {
     const foundElevator = elevators.find((e) => e.id === Number(route.params.id));
@@ -28,6 +29,11 @@ onMounted(() => {
 
     elevator.value = foundElevator;
 });
+
+function remove(id: number) {
+    removeElevator(id);
+    router.push({ path: '/elevators' });
+}
 
 watch(elevator, (value) => {
     if (value) {

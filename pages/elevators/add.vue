@@ -18,7 +18,7 @@
                 </a-select-option>
             </a-select>
         </a-form-item>
-        <a-form-item name="capacity" label="Грузоподъемность">
+        <a-form-item name="capacity" label="Грузоподъемность (кг)">
             <a-input
                 v-model:value="formData.capacity"
                 type="number"
@@ -26,7 +26,7 @@
                 max="5000"
             />
         </a-form-item>
-        <a-form-item name="speed" label="Скорость">
+        <a-form-item name="speed" label="Скорость (м\с)">
             <a-input
                 v-model:value="formData.speed"
                 type="number"
@@ -100,8 +100,8 @@ const formData = reactive<ElevatorForm>({
     capacity: 320,
     speed: 1.5,
     type: ElevatorTypes.PASSENGER,
-    creationDate: '',
-    lastServiceDate: '',
+    creationDate: dayjs(),
+    lastServiceDate: null,
 });
 
 const elevatorTypeOptions: SelectProps['options'] = [
@@ -121,8 +121,8 @@ async function onSubmit() {
 
         const { id } = elevatorStore.addElevator({
             ...formData,
-            creationDate: dayjs(formData.creationDate).format(),
-            lastServiceDate: dayjs(formData.lastServiceDate).format(),
+            creationDate: dayjs(formData.creationDate),
+            lastServiceDate: dayjs(formData.lastServiceDate),
         });
 
         await router.push({ path: `/elevators/${id}` });
