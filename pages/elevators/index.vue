@@ -11,22 +11,15 @@
     </PageTitle>
 
     <client-only>
-        <div class="flex flex-wrap w-full">
-            <nuxt-link
+        <div v-if="elevators.length" class="flex flex-wrap w-full">
+            <ElevatorCard
                 v-for="elevator of elevators"
                 :key="elevator.id"
-                :to="`/elevators/${elevator.id}`"
-            >
-                    <ElevatorCard
-                        :elevator="elevator"
-                        :state="getElevatorState(elevator.id)"
-                    ></ElevatorCard>
-
-            </nuxt-link>
+                :elevator="elevator"
+                :state="getElevatorState(elevator.id)"
+            ></ElevatorCard>
         </div>
-        <template #fallback>
-            <a-empty/>
-        </template>
+        <a-empty v-else/>
     </client-only>
 </template>
 

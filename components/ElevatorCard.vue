@@ -1,30 +1,31 @@
 <template>
-    <a-card
-        hoverable
-        class="mr-5 mb-5 elevator-card"
-        :class="statusClass"
-    >
-        <template #cover>
-            <!--  <nuxt-img></nuxt-img>-->
-        </template>
-
-        <a-card-meta :title="elevator.name">
-            <template #description>
-                <p class="elevator-card__state">
-                    <MenuUnfoldOutlined />
-                    <b>{{ state.currentFloor }}</b>
-                </p>
-                <p class="elevator-card__state">
-                    <VerticalAlignMiddleOutlined />
-                    <b>
-                        <UpCircleTwoTone v-if="state.direction === Direction.UP"/>
-                        <DownCircleTwoTone v-else-if="state.direction === Direction.DOWN"/>
-                        <template v-else>-</template>
-                    </b>
-                </p>
+    <nuxt-link :to="`/elevators/${elevator.id}`" class="elevator-card">
+        <a-card
+            hoverable
+            :class="statusClass"
+        >
+            <template #cover>
+                <!--  <nuxt-img></nuxt-img>-->
             </template>
-        </a-card-meta>
-    </a-card>
+
+            <a-card-meta :title="elevator.name">
+                <template #description>
+                    <p class="elevator-card__state">
+                        <MenuUnfoldOutlined />
+                        <b>{{ state.currentFloor }}</b>
+                    </p>
+                    <p class="elevator-card__state">
+                        <VerticalAlignMiddleOutlined />
+                        <b>
+                            <UpCircleTwoTone v-if="state.direction === Direction.UP"/>
+                            <DownCircleTwoTone v-else-if="state.direction === Direction.DOWN"/>
+                            <template v-else>-</template>
+                        </b>
+                    </p>
+                </template>
+            </a-card-meta>
+        </a-card>
+    </nuxt-link>
 </template>
 
 <script setup lang="ts">
@@ -49,6 +50,9 @@ const statusClass = computed(() => {
 
 <style lang="scss" scoped>
 .elevator-card {
+    width: 20%;
+    gap: 10px 10px;
+
     &__state {
         &__disabled {
             background-color: rgba(#eee, 50%);

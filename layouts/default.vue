@@ -15,7 +15,6 @@
 
 <script setup lang="ts">
     const route = useRoute();
-
     const routeLevel = computed(() => route.path.split('/').length);
 </script>
 
