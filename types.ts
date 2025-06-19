@@ -1,5 +1,12 @@
 import type { Dayjs } from 'dayjs';
 
+// auth
+export const enum CookieTypes {
+    ACCESS_TOKEN = 'accessToken',
+    REFRESH_TOKEN = 'refreshToken'
+}
+
+// elevators
 export const enum ElevatorTypes {
     PASSENGER = 'passenger',
     CARGO = 'cargo',
@@ -30,3 +37,4 @@ export interface ElevatorState {
     queue: number[] | null;
     direction: Direction | null;
 }
+
