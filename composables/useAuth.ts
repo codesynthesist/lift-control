@@ -13,6 +13,12 @@ interface IAuthState {
     token: string | null;
 }
 
+interface IAuthCredentials {
+    [CookieTypes.ACCESS_TOKEN]: string;
+    [CookieTypes.REFRESH_TOKEN]: string;
+    [CookieTypes.EXPIRES]: string;
+}
+
 export const useAuth = () => {
     const accessToken = useCookie(CookieTypes.ACCESS_TOKEN);
 
@@ -21,56 +27,6 @@ export const useAuth = () => {
         isAuthenticated: false,
         token: null,
     }));
-
-    function setUser(data: IUser): void {
-        if (data.id) {
-            state.value.user = data;
-            state.value.isAuthenticated = true;
-        } else {
-            throw createError({
-                statusText: 'User not found',
-            });
-        }
-    }
-
-    async function signUp(email: string, password: string): Promise<IUser> {
-        const data: IUser = await $fetch('/api/auth/signup', {
-            method: 'POST',
-            body: { email, password },
-        });
-
-        // a method that supposes the user logging in after registration
-        setUser(data);
-
-        return data;
-    }
-
-    async function signIn(email: string, password: string): Promise<IUser> {
-        const data: IUser = await $fetch('/api/auth/signin', {
-            method: 'POST',
-            body: { email, password },
-        });
-
-        setUser(data);
-
-        return data;
-    }
-
-    async function signOut(): Promise<void> {
-        await $fetch('/api/auth/signout');
-
-        state.value.user = null;
-        state.value.isAuthenticated = false;
-    }
-
-    async function refreshSession(refreshToken: string): Promise<void> {
-        await $fetch('/api/auth/refresh', {
-            method: 'GET',
-            params: {
-                refreshToken,
-            },
-        });
-    }
 
     const checkAuth = async () => {
         if (!accessToken.value) {
@@ -85,7 +41,7 @@ export const useAuth = () => {
             const data: IUser = await $fetch('/api/auth/user');
 
             if (data.id) {
-                state.value.token = accessToken.value;
+                state.value.token = accessToken.value as string;
                 state.value.user = data;
                 state.value.isAuthenticated = true;
 
@@ -102,12 +58,49 @@ export const useAuth = () => {
         return false;
     };
 
+     // TODO: Bullshit - need define type for arguments, need FSD?
+    // Omit<RegisterForm, 'passwordRepeat'>
+    async function signUp(name: string, email: string, password: string): Promise<IUser> {
+        return await $fetch('/api/auth/signup', {
+            method: 'POST',
+            body: { name, email, password },
+        });
+    }
+
+    async function signIn(email: string, password: string): Promise<IAuthCredentials> {
+        const data: IAuthCredentials = await $fetch('/api/auth/signin', {
+            method: 'POST',
+            body: { email, password },
+        });
+
+        await checkAuth();
+
+        return data;
+    }
+
+    async function signOut(): Promise<void> {
+        await $fetch('/api/auth/signout');
+        await checkAuth();
+        console.log('session signed out');
+    }
+
+    async function refreshSession(refreshToken: string): Promise<void> {
+        await $fetch('/api/auth/refresh', {
+            method: 'GET',
+            params: {
+                refreshToken,
+            },
+        });
+    }
+
+
+
     return {
-        user: state.value.user,
-        isAuthenticated: state.value.isAuthenticated,
+        user: toRef(state.value, 'user'),
+        isAuthenticated: toRef(state.value, 'isAuthenticated'),
+        signUp,
         signIn,
         signOut,
-        signUp,
         refreshSession,
         checkAuth,
     };

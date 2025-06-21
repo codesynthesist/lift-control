@@ -1,16 +1,20 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-    if (process.server || to.meta.public) {
+    const { isAuthenticated } = useAuth();
+
+    if (process.server) {
         return;
     }
 
-    const { isAuthenticated } = useAuth();
-
-    if (to.path === '/login' && isAuthenticated) {
-        return navigateTo(to.query.redirect as string || '/');
+    if (!isAuthenticated.value && to.meta.public) {
+        return;
     }
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated.value) {
         return navigateTo(`/login?redirect=${to.path}`);
+    }
+
+    if (to.meta.public && isAuthenticated.value) {
+        return navigateTo(to.query.redirect as string || '/');
     }
 
     return;
