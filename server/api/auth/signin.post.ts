@@ -19,11 +19,11 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const { access_token, expires_in, refresh_token } = data.session
+    const { access_token, expires_in, refresh_token } = data.session;
 
-    // set access token in cookie
+    // set acccess token token in cookie
     setCookie(event, CookieTypes.ACCESS_TOKEN, access_token, {
-        maxAge: expires_in * 1000,
+        maxAge: expires_in,
     });
 
     // set refresh token in cookie
@@ -31,11 +31,9 @@ export default defineEventHandler(async (event) => {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
     });
 
-    // get new User
-
-    return await $fetch('/api/auth/user', {
-        headers: {
-            Cookie: getCookie(event, CookieTypes.ACCESS_TOKEN) as string,
-        }
-    });
+    return {
+        [CookieTypes.ACCESS_TOKEN]: access_token,
+        [CookieTypes.REFRESH_TOKEN]: refresh_token,
+        [CookieTypes.EXPIRES]: expires_in,
+    }
 });

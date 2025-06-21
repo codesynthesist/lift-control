@@ -3,7 +3,9 @@ import type { Dayjs } from 'dayjs';
 // auth
 export const enum CookieTypes {
     ACCESS_TOKEN = 'accessToken',
-    REFRESH_TOKEN = 'refreshToken'
+    REFRESH_TOKEN = 'refreshToken',
+    EXPIRES = 'expiresIn',
+    AUTHORIZATION = 'Authorization',
 }
 
 // elevators
