@@ -65,7 +65,7 @@
 
     async function onFinish(values: IFormData) {
         try {
-            await signIn(values.email, values.password);
+            await signIn(values);
             await router.push('/');
         } catch (error) {
             notification.error({

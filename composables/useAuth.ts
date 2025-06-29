@@ -1,22 +1,17 @@
 import { $fetch } from 'ofetch';
-import { CookieTypes } from '~/types';
+import {
+    CookieTypes,
+    type IUser,
+    type SignInRequest,
+    type SignInResponse,
+    type SignUpRequest,
+} from '@/types/auth';
 
-export interface IUser {
-    id: string;
-    email: string;
-    name?: string;
-}
 
 interface IAuthState {
     user: IUser | null;
     isAuthenticated: boolean;
     token: string | null;
-}
-
-interface IAuthCredentials {
-    [CookieTypes.ACCESS_TOKEN]: string;
-    [CookieTypes.REFRESH_TOKEN]: string;
-    [CookieTypes.EXPIRES]: string;
 }
 
 export const useAuth = () => {
@@ -58,19 +53,19 @@ export const useAuth = () => {
         return false;
     };
 
-     // TODO: Bullshit - need define type for arguments, need FSD?
-    // Omit<RegisterForm, 'passwordRepeat'>
-    async function signUp(name: string, email: string, password: string): Promise<IUser> {
+    async function signUp(body: SignUpRequest): Promise<{ session: object }> {
         return await $fetch('/api/auth/signup', {
             method: 'POST',
-            body: { name, email, password },
+            body,
         });
+
+        // what returns?
     }
 
-    async function signIn(email: string, password: string): Promise<IAuthCredentials> {
-        const data: IAuthCredentials = await $fetch('/api/auth/signin', {
+    async function signIn(body: SignInRequest): Promise<SignInResponse> {
+        const data: SignInResponse = await $fetch('/api/auth/signin', {
             method: 'POST',
-            body: { email, password },
+            body,
         });
 
         await checkAuth();
@@ -81,6 +76,7 @@ export const useAuth = () => {
     async function signOut(): Promise<void> {
         await $fetch('/api/auth/signout');
         await checkAuth();
+
         console.log('session signed out');
     }
 
@@ -92,7 +88,6 @@ export const useAuth = () => {
             },
         });
     }
-
 
 
     return {

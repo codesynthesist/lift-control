@@ -14,7 +14,7 @@
                 <div class="flex" style="color: white">
                     <a-dropdown>
                         <a class="ant-dropdown-link" @click.prevent>
-                            Пользователь: {{ user.name }}
+                            {{ user.name }}
                             <down-outlined />
                         </a>
                         <template #overlay>

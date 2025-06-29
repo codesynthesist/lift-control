@@ -22,7 +22,7 @@ export const useElevatorsStore = defineStore(
             const id = new Date().getTime();
             const elevator: ElevatorConfig = {
                 id,
-                ...params
+                ...params,
             };
 
             elevators.value.push(elevator);
@@ -69,5 +69,5 @@ export const useElevatorsStore = defineStore(
             storage: piniaPluginPersistedstate.localStorage(),
             pick: ['elevators', 'elevatorsState'],
         },
-    }
+    },
 );
