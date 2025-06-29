@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { type PostgrestFilterBuilder } from '@supabase/postgrest-js';
 
 if (!process.env.SUPABASE_KEY || !process.env.SUPABASE_URL) {
     throw new Error('supabase key is not available in env variables');
@@ -38,7 +39,7 @@ export function handleSupabaseError(error: SupabaseError) {
 }
 
 export async function query<T>(
-    query: Promise<{ data: T | null; error: SupabaseError | null }>,
+    query: PostgrestFilterBuilder<any, any, T, any, any>, // Скорее всего, здесь нужно уточнить типы
 ): Promise<T> {
     const { data, error } = await query;
 
@@ -50,7 +51,7 @@ export async function query<T>(
     if (!data) {
         throw createError({
             statusCode: 404,
-            statusMessage: 'Data not found',
+            statusMessage: 'Данные не найдены',
         });
     }
 
