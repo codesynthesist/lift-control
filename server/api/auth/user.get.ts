@@ -1,5 +1,5 @@
-import { db } from '~/server/utils/db';
-import { CookieTypes } from '~/types';
+import { db, query } from '@/server/utils/db';
+import { CookieTypes } from '@/types/auth';
 
 export default defineEventHandler(async (event) => {
     const access_token = getCookie(event, CookieTypes.ACCESS_TOKEN);
@@ -13,8 +13,19 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    return {
-        id: data.user.id,
-        email: data.user.email,
-    };
+    if (data.user.id) {
+        const [profile] = await query(
+            db
+                .from('profiles')
+                .select()
+                .eq('id', data.user.id)
+        );
+
+        return {
+            id: data.user.id,
+            email: data.user.email,
+            name: profile.full_name,
+            createdAt: profile.createdAt,
+        };
+    }
 });

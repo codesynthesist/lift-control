@@ -1,9 +1,9 @@
-import { db } from '~/server/utils/db';
-import { CookieTypes } from '~/types';
-import { $fetch } from 'ofetch';
+import { db } from '@/server/utils/db';
+import { CookieTypes, SignInRequest } from '@/types/auth';
+import { setSession } from '~/server/utils/auth';
 
 export default defineEventHandler(async (event) => {
-    const { email, password } = await readBody(event);
+    const { email, password }: SignInRequest = await readBody<SignInRequest>(event);
 
    // get user from auth db
     const { data, error: authError } = await db.auth.signInWithPassword({
@@ -13,27 +13,30 @@ export default defineEventHandler(async (event) => {
 
     if (authError) {
         throw createError({
-            statusCode: authError.status,
-            statusMessage: authError.message,
+            statusCode: authError.status || 401,
+            statusMessage: authError.message || 'Authentication failed',
             data: authError,
         });
     }
 
-    const { access_token, expires_in, refresh_token } = data.session;
+    if (!data?.session) {
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'Session data missing',
+        });
+    }
 
-    // set acccess token token in cookie
-    setCookie(event, CookieTypes.ACCESS_TOKEN, access_token, {
-        maxAge: expires_in,
-    });
+    const {
+        access_token: accessToken,
+        expires_in: expiresIn,
+        refresh_token: refreshToken,
+    } = data.session;
 
-    // set refresh token in cookie
-    setCookie(event, CookieTypes.REFRESH_TOKEN, refresh_token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    });
+    setSession(event, { accessToken, expiresIn, refreshToken });
 
     return {
-        [CookieTypes.ACCESS_TOKEN]: access_token,
-        [CookieTypes.REFRESH_TOKEN]: refresh_token,
-        [CookieTypes.EXPIRES]: expires_in,
+        [CookieTypes.ACCESS_TOKEN]: accessToken,
+        [CookieTypes.REFRESH_TOKEN]: refreshToken,
+        [CookieTypes.EXPIRES]: expiresIn,
     }
 });

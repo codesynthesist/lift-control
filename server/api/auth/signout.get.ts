@@ -1,6 +1,7 @@
-import { CookieTypes } from '~/types';
+import { removeSession } from '@/server/utils/auth';
 
 export default defineEventHandler((event) => {
-    deleteCookie(event, CookieTypes.ACCESS_TOKEN);
-    deleteCookie(event, CookieTypes.REFRESH_TOKEN);
+    removeSession(event);
+
+    return { ok: true };
 })
